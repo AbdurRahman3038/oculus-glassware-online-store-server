@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectID;
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000
@@ -20,29 +21,89 @@ async function run() {
         const database = client.db('oculusGlasswareDB');
         const reviewsCollection = database.collection('reviews');
         const usersCollection = database.collection('users');
+        const productsCollection = database.collection('products');
+        const ordersCollection = database.collection('orders');
 
         // POST API to add review
         app.post('/reviews', async (req, res) => {
             const review = req.body;
-            console.log('first post API hitted', review);
             const result = await reviewsCollection.insertOne(review);
-            console.log(result);
             res.json(result);
         });
 
-        // GET API to add review
+        // GET API to get review
         app.get('/reviews', async (req, res) => {
             const review = reviewsCollection.find({});
             const reviews = await review.toArray();
             res.send(reviews);
         });
 
+        // POST API to add products
+        app.post('/products', async (req, res) => {
+            const product = req.body;
+            const result = await productsCollection.insertOne(product);
+            res.json(result);
+        });
+
+        // GET API to get product
+        app.get('/products', async (req, res) => {
+            const product = productsCollection.find({});
+            const products = await product.toArray();
+            res.send(products);
+        });
+
+        // DELETE API from packages
+        app.delete('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(query);
+            res.json(result);
+        })
+
+        // POST API to book
+        app.post('/orders', async (req, res) => {
+            const order = req.body;
+            const result = await ordersCollection.insertOne(order);
+            res.json(result);
+        });
+
+        //GET API
+        app.get('/orders', async (req, res) => {
+            const cursor = ordersCollection.find({});
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
+        //GET API for specific user
+        app.get('/orders/:email', async (req, res) => {
+            const cursor = ordersCollection.find({ email: req.params.email });
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
+        //Update booking status
+        app.patch('/orders/update/:id', (req, res) => {
+            ordersCollection.updateOne({ _id: ObjectId(req.params.id) },
+                {
+                    $set: { status: req.body.status }
+                })
+                .then(result => {
+                    res.send(result.modifiedCount > 0)
+                })
+        })
+
+        // DELETE API from bookings
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            res.json(result);
+        })
+
         // POST API to add user to database
         app.post('/users', async (req, res) => {
             const user = req.body;
-            console.log('first post API hitted', user);
             const result = await usersCollection.insertOne(user);
-            console.log(result);
             res.json(result);
         });
 
@@ -71,7 +132,6 @@ async function run() {
         // PUT API to make admin
         app.put('/users/admin', async (req, res) => {
             const user = req.body;
-            console.log('put', user);
             const filter = { email: user.email };
             const updateDoc = { $set: { role: 'admin' } };
             const result = await usersCollection.updateOne(filter, updateDoc);
