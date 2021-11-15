@@ -11,6 +11,6 @@ At a glance:
 
 # Important Links:
 
-Client-side Link: coming soon
+Client-side Link: https://github.com/programming-hero-web-course-4/niche-website-client-side-AbdurRahman3038 
 
-Live Link: coming soon
+Live Link: https://glassware-store.web.app/ 
