@@ -11,6 +11,6 @@ At a glance:
 
 # Important Links:
 
-Client-side Link: https://github.com/programming-hero-web-course-4/niche-website-client-side-AbdurRahman3038 
+Client-side Link: https://github.com/AbdurRahman3038/oculus-glassware-online-store-client 
 
 Live Link: https://glassware-store.web.app/ 
